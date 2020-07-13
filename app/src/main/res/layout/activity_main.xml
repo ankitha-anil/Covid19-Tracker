@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="#122555"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+
+    <!--Relative Layout to display all the details-->
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="20dp">
+
+        <!--Text view to display Total Cases-->
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="500dp"
+            android:layout_height="275dp"
+            android:layout_centerHorizontal="true"
+            android:background="#122555"
+            app:srcCompat="@drawable/covid" />
+
+        <TextView
+            android:id="@+id/cases"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="275dp"
+            android:text="Total Cases:"
+            android:textColor="@color/color_white"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:fontFamily="sans-serif-smallcaps" />
+
+        <!--Text view to display the updated number when data
+        will fetch from the API. For now default set to 0 -->
+
+        <TextView
+            android:id="@+id/tvCases"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="170dp"
+            android:layout_marginTop="275dp"
+            android:fontFamily="sans-serif-smallcaps"
+            android:text="0"
+            android:textColor="#F8C639"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <!--Text view to display Recovered Cases-->
+
+        <TextView
+            android:id="@+id/recovered"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/cases"
+            android:layout_marginLeft="10dp"
+            android:text="Recovered:"
+            android:textColor="@color/color_white"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:fontFamily="sans-serif-smallcaps" />
+
+        <!--Text view to display the updated number when data
+        will fetch from the API. For now default set to 0 -->
+
+        <TextView
+            android:id="@+id/tvRecovered"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="150dp"
+            android:layout_below="@id/tvCases"
+            android:fontFamily="sans-serif-smallcaps"
+            android:text="0"
+            android:textColor="@color/color_one"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <!--Text view to display Active Cases-->
+        <TextView
+            android:id="@+id/active"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/recovered"
+            android:layout_marginLeft="10dp"
+            android:text="Active:"
+            android:textColor="@color/color_white"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:fontFamily="sans-serif-smallcaps" />
+
+        <!--Text view to display the updated number when data
+        will fetch from the API. For now default set to 0 -->
+        <TextView
+            android:id="@+id/tvActive"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="100dp"
+            android:layout_below="@id/tvRecovered"
+            android:fontFamily="sans-serif-smallcaps"
+            android:text="0"
+            android:textColor="#12B6A7"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <!--Text view to display Total Deaths-->
+        <TextView
+            android:id="@+id/deaths"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/active"
+            android:layout_marginLeft="10dp"
+            android:text="Deaths:"
+            android:textColor="@color/color_white"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:fontFamily="sans-serif-smallcaps" />
+
+        <!--Text view to display the updated number when data
+        will fetch from the API. For now default set to 0 -->
+        <TextView
+
+            android:id="@+id/tvTotalDeaths"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="110dp"
+            android:layout_below="@id/tvActive"
+            android:fontFamily="sans-serif-smallcaps"
+            android:text="0"
+            android:textColor="#939393"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <com.razerdp.widget.animatedpieview.AnimatedPieView
+            android:id="@+id/piechart"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/deaths" />
+
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/linechart"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/piechart"/>
+
+        <TableLayout
+            android:id="@+id/table"
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/linechart"
+            android:stretchColumns="0,1,2,3,4">
+
+
+           <TableRow
+                android:id="@+id/tableRow1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorPrimaryDark">
+
+               <TextView
+                   android:id="@+id/stateheader"
+                   android:layout_weight="0"
+                   android:gravity="center"
+                   android:padding="5dp"
+                   android:text="States/ Constituents "
+                   android:textColor="#FFFFFF" />
+
+                <TextView
+                    android:id="@+id/theader"
+                    android:layout_weight="0"
+                    android:gravity="center"
+                    android:padding="5dp"
+                    android:text="Total"
+                    android:textColor="#F8C639"/>
+
+                <TextView
+                    android:id="@+id/rheader"
+                    android:layout_weight="0"
+                    android:gravity="center"
+                    android:padding="5dp"
+                    android:text="R"
+                    android:textColor="@color/color_one" />
+
+                <TextView
+                    android:id="@+id/aheader"
+                    android:layout_weight="0"
+                    android:gravity="center"
+                    android:padding="5dp"
+                    android:text="A"
+                    android:textColor="#12B6A7"/>
+
+               <TextView
+                    android:id="@+id/dheader"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:padding="5dp"
+                   android:text="D"
+                    android:textColor="#000000" />
+
+            </TableRow>
+
+        </TableLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/table"
+            android:textColor="@color/color_white"
+            android:id="@+id/no"/>
+
+    </RelativeLayout>
+
+</ScrollView>
+
