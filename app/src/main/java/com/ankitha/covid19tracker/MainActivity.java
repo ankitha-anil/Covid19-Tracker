@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.widget.SeekBar;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -16,11 +17,32 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.github.mikephil.charting.listener.OnChartGestureListener;
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.razerdp.widget.animatedpieview.AnimatedPieView;
 import com.razerdp.widget.animatedpieview.AnimatedPieViewConfig;
 import com.razerdp.widget.animatedpieview.callback.OnPieSelectListener;
 import com.razerdp.widget.animatedpieview.data.IPieInfo;
 import com.razerdp.widget.animatedpieview.data.SimplePieInfo;
+
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.components.YAxis.AxisDependency;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
+import com.github.mikephil.charting.utils.ColorTemplate;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 
 import org.json.JSONArray;
@@ -31,17 +53,19 @@ import java.util.Iterator;
 
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
-public class MainActivity
+public  class MainActivity
         extends AppCompatActivity {
 
     // Create the object of TextView
-    TextView tvCases, tvRecovered, tvActive, tvTotalDeaths, state, rec, tot, act, dea,no,none;
-    TableRow tr,td;
+    TextView tvCases, tvRecovered, tvActive, tvTotalDeaths, state, rec, tot, act, dea, no, none;
+    TableRow tr, td,tableRow;
     TableLayout table;
 
+    private static final String TAG = "MainActivity";
+    private LineChart linechart;
+
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -55,24 +79,21 @@ public class MainActivity
                 = findViewById(R.id.tvActive);
         tvTotalDeaths
                 = findViewById(R.id.tvTotalDeaths);
-        no =findViewById(R.id.no);
-
-        table = (TableLayout) findViewById(R.id.table);
-
-
-        table.setColumnStretchable(0,true);
-        table.setColumnStretchable(1,true);
-        table.setColumnStretchable(2,true);
-        table.setColumnStretchable(3,true);
-        table.setColumnStretchable(4,true);
+        table
+                = findViewById(R.id.table);
+        tableRow
+                = findViewById(R.id.tableRow1);
+        linechart
+                = findViewById(R.id.linechart);
+        tableRow.setBackgroundColor(Color.argb(90,128,128,128));
 
         // Creating a method fetchdata()
         fetchdata();
 
+
     }
 
-    private void fetchdata()
-    {
+    private void fetchdata() {
 
         // Create a String request
         String url = "https://api.covid19india.org/data.json";
@@ -86,8 +107,7 @@ public class MainActivity
                 new Response.Listener<String>() {
                     @SuppressLint("DefaultLocale")
                     @Override
-                    public void onResponse(String response)
-                    {
+                    public void onResponse(String response) {
 
                         // Handle the JSON object and
                         // handle it inside try and catch
@@ -101,10 +121,10 @@ public class MainActivity
                             JSONObject data = paramsArr.getJSONObject(0);
 
 
-                            int recovered =Integer.parseInt(data.getString("recovered"));
-                            int active =Integer.parseInt(data.getString("active"));
-                            int death =Integer.parseInt(data.getString("deaths"));
-                            int cases =Integer.parseInt(data.getString("confirmed"));
+                            int recovered = Integer.parseInt(data.getString("recovered"));
+                            int active = Integer.parseInt(data.getString("active"));
+                            int death = Integer.parseInt(data.getString("deaths"));
+                            int cases = Integer.parseInt(data.getString("confirmed"));
 
 
                             // Set the data in text view
@@ -119,20 +139,20 @@ public class MainActivity
                             tvActive.setText(String.format("%,d", active));
                             tvTotalDeaths.setText(String.format("%,d", death));
 
-                            fetchchart(recovered, active, death); //Fetch the Pie Chart
+                            fetchpiechart(recovered, active, death); //Fetch the Pie Chart
+
+                            fetchchart(); //Fetch the line chart
 
                             fetchtable(paramsArr); //Fetch the table for State info
 
-                        }
-                        catch (JSONException e) {
+                        } catch (JSONException e) {
                             e.printStackTrace();
                         }
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
-                    public void onErrorResponse(VolleyError error)
-                    {
+                    public void onErrorResponse(VolleyError error) {
                         Toast.makeText(
                                 MainActivity.this,
                                 error.getMessage(),
@@ -146,87 +166,15 @@ public class MainActivity
         requestQueue.add(request);
     }
 
-    @SuppressLint({"DefaultLocale", "ResourceType"})
-    public void fetchtable(JSONArray obj) throws JSONException {
 
-        for( int i = 1; i<obj.length() ;i++ ) {
-
-            JSONObject data = obj.getJSONObject(i);
-
-            int total= Integer.parseInt(data.getString("confirmed"));
-            int recovered= Integer.parseInt(data.getString("recovered"));
-            int active= Integer.parseInt(data.getString("active"));
-            int death= Integer.parseInt(data.getString("deaths"));
-            String name = data.getString("state");
-
-            tr = new TableRow(this);
-            td = new TableRow(this);
-
-            // Here create the TextView dynamically
-
-            state = new TextView(this);
-            state.setText(name);
-            if(name.equals("Dadra and Nagar Haveli and Daman and Diu")){
-                state.setText("Daman and Diu");
-            }
-            if(name.equals("Andaman and Nicobar Islands")){
-                state.setText("AN Islands");
-            }
-            state.setTextColor(Color.WHITE);
-            state.setTextSize(16);
-            state.setPadding(5,5,5,5);
-            tr.addView(state);
-
-            tot = new TextView(this);
-            tot.setText(String.format("%,d", total));
-            tot.setPadding(5,5,5,5);
-            tot.setTextSize(16);
-            tot.setTextColor(Color.rgb(248, 198, 57));
-            tr.addView(tot);
-
-            rec = new TextView(this);
-            rec.setText(String.format("%,d", recovered));
-            rec.setPadding(5,5,5,5);
-            rec.setTextSize(16);
-            rec.setTextColor(Color.rgb(251, 114, 104));
-            tr.addView(rec);
-
-            act = new TextView(this);
-            act.setText(String.format("%,d", active));
-            act.setPadding(5,5,5,5);
-            act.setTextSize(16);
-            act.setTextColor(Color.rgb(18, 182, 167));
-            tr.addView(act);
-
-            dea = new TextView(this);
-            dea.setPadding(5,5,5,5);
-            dea.setTextSize(16);
-            dea.setText(String.format("%,d", death));
-            dea.setTextColor(Color.rgb(128, 128, 128));
-            tr.addView(dea);
-
-            none= new TextView(this);
-            none.setText("  ");
-            td.addView(none);
-
-        // finally add this to the table row
-            table.addView(tr);
-            table.addView(td);
-
-
-        }
-    }
-
-
-    public void fetchchart(int rec, int act, int dea)
-    {
+    public void fetchpiechart(int rec, int act, int dea) {
         AnimatedPieView mAnimatedPieView = findViewById(R.id.piechart);
         AnimatedPieViewConfig config = new AnimatedPieViewConfig();
 
-        config.startAngle(-150)// Starting angle offset
-                .addData(new SimplePieInfo(rec, Color.rgb(251, 114, 104),"Recovered"))//Data (bean that implements the IPieInfo interface)
-                .addData(new SimplePieInfo(dea, Color.rgb(147, 147, 147),"Deaths"))
-                .addData(new SimplePieInfo(act, Color.rgb(18, 182, 167),"Active"))
+        config.startAngle(-140)// Starting angle offset
+                .addData(new SimplePieInfo(rec, Color.rgb(251, 114, 104), "Recovered"))//Data (bean that implements the IPieInfo interface)
+                .addData(new SimplePieInfo(dea, Color.rgb(147, 147, 147), "Deaths"))
+                .addData(new SimplePieInfo(act, Color.rgb(18, 182, 167), "Active"))
                 .duration(1500)
                 .drawText(true)
                 .textSize(35);
@@ -243,6 +191,110 @@ public class MainActivity
         mAnimatedPieView.start();
 
     }
+
+    public void fetchchart() {
+
+        linechart.setDragEnabled(true);
+        linechart.setBackgroundColor(Color.argb(80,173, 178, 186));
+
+        ArrayList<Entry> yValues = new ArrayList<>();
+
+        yValues.add(new Entry(0, 60f));
+        yValues.add(new Entry(1, 50f));
+        yValues.add(new Entry(2, 70f));
+        yValues.add(new Entry(3, 30f));
+        yValues.add(new Entry(4, 90f));
+
+        LineDataSet set1 = new LineDataSet(yValues, "Data Set 1");
+
+        set1.setFillAlpha(110);
+        set1.setColor(Color.rgb(251, 114, 104));
+        set1.setLineWidth(3);
+
+        ArrayList<ILineDataSet> dataSets = new ArrayList<>();
+        dataSets.add(set1);
+
+        LineData data = new LineData(dataSets);
+        linechart.setData(data);
+
+        table.setColumnStretchable(0, true);
+        table.setColumnStretchable(1, true);
+        table.setColumnStretchable(2, true);
+        table.setColumnStretchable(3, true);
+        table.setColumnStretchable(4, true);
+    }
+
+    @SuppressLint({"DefaultLocale", "ResourceType"})
+    public void fetchtable(JSONArray obj) throws JSONException {
+
+        for (int i = 1; i < obj.length(); i++) {
+
+            JSONObject data = obj.getJSONObject(i);
+
+            int total = Integer.parseInt(data.getString("confirmed"));
+            int recovered = Integer.parseInt(data.getString("recovered"));
+            int active = Integer.parseInt(data.getString("active"));
+            int death = Integer.parseInt(data.getString("deaths"));
+            String name = data.getString("state");
+
+            tr = new TableRow(this);
+            td = new TableRow(this);
+
+            // Here create the TextView dynamically
+
+            state = new TextView(this);
+            state.setText(name);
+            if (name.equals("Dadra and Nagar Haveli and Daman and Diu")) {
+                state.setText("Daman and Diu");
+            }
+            if (name.equals("Andaman and Nicobar Islands")) {
+                state.setText("AN Islands");
+            }
+            state.setTextColor(Color.WHITE);
+            state.setTextSize(16);
+            state.setPadding(5, 5, 5, 5);
+            tr.addView(state);
+
+            tot = new TextView(this);
+            tot.setText(String.format("%,d", total));
+            tot.setPadding(5, 5, 5, 5);
+            tot.setTextSize(16);
+            tot.setTextColor(Color.rgb(248, 198, 57));
+            tr.addView(tot);
+
+            rec = new TextView(this);
+            rec.setText(String.format("%,d", recovered));
+            rec.setPadding(5, 5, 5, 5);
+            rec.setTextSize(16);
+            rec.setTextColor(Color.rgb(251, 114, 104));
+            tr.addView(rec);
+
+            act = new TextView(this);
+            act.setText(String.format("%,d", active));
+            act.setPadding(5, 5, 5, 5);
+            act.setTextSize(16);
+            act.setTextColor(Color.rgb(18, 182, 167));
+            tr.addView(act);
+
+            dea = new TextView(this);
+            dea.setPadding(5, 5, 5, 5);
+            dea.setTextSize(16);
+            dea.setText(String.format("%,d", death));
+            dea.setTextColor(Color.rgb(128, 128, 128));
+            tr.addView(dea);
+
+            none = new TextView(this);
+            none.setText("  ");
+            td.addView(none);
+
+            // finally add this to the table row
+            table.addView(tr);
+            table.addView(td);
+
+
+        }
+    }
 }
+
 
 
