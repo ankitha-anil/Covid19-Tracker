@@ -1,10 +1,13 @@
 package com.ankitha.covid19tracker;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.widget.SeekBar;
 import android.widget.TableLayout;
@@ -17,6 +20,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.github.mikephil.charting.components.Description;
+import com.github.mikephil.charting.components.LegendEntry;
 import com.github.mikephil.charting.listener.OnChartGestureListener;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.razerdp.widget.animatedpieview.AnimatedPieView;
@@ -57,12 +62,13 @@ public  class MainActivity
         extends AppCompatActivity {
 
     // Create the object of TextView
-    TextView tvCases, tvRecovered, tvActive, tvTotalDeaths, state, rec, tot, act, dea, no, none;
+    TextView tvCases, tvRecovered, tvActive, tvTotalDeaths, state, rec, tot, act, dea, time, none;
     TableRow tr, td,tableRow;
     TableLayout table;
 
     private static final String TAG = "MainActivity";
     private LineChart linechart;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,13 +85,20 @@ public  class MainActivity
                 = findViewById(R.id.tvActive);
         tvTotalDeaths
                 = findViewById(R.id.tvTotalDeaths);
+        time
+                = findViewById(R.id.time);
         table
                 = findViewById(R.id.table);
         tableRow
                 = findViewById(R.id.tableRow1);
         linechart
                 = findViewById(R.id.linechart);
-        tableRow.setBackgroundColor(Color.argb(90,128,128,128));
+
+        table.setColumnStretchable(0, true);
+        table.setColumnStretchable(1, true);
+        table.setColumnStretchable(2, true);
+        table.setColumnStretchable(3, true);
+        table.setColumnStretchable(4, true);
 
         // Creating a method fetchdata()
         fetchdata();
@@ -138,10 +151,11 @@ public  class MainActivity
                                     String.format("%,d", recovered));
                             tvActive.setText(String.format("%,d", active));
                             tvTotalDeaths.setText(String.format("%,d", death));
+                            time.setText(data.getString("lastupdatedtime"));
 
                             fetchpiechart(recovered, active, death); //Fetch the Pie Chart
 
-                            fetchchart(); //Fetch the line chart
+                            fetchchart(obj); //Fetch the line chart
 
                             fetchtable(paramsArr); //Fetch the table for State info
 
@@ -172,7 +186,7 @@ public  class MainActivity
         AnimatedPieViewConfig config = new AnimatedPieViewConfig();
 
         config.startAngle(-140)// Starting angle offset
-                .addData(new SimplePieInfo(rec, Color.rgb(251, 114, 104), "Recovered"))//Data (bean that implements the IPieInfo interface)
+                .addData(new SimplePieInfo(rec, Color.rgb(246, 180, 67), "Recovered"))//Data (bean that implements the IPieInfo interface)
                 .addData(new SimplePieInfo(dea, Color.rgb(147, 147, 147), "Deaths"))
                 .addData(new SimplePieInfo(act, Color.rgb(18, 182, 167), "Active"))
                 .duration(1500)
@@ -192,40 +206,100 @@ public  class MainActivity
 
     }
 
-    public void fetchchart() {
+    public void fetchchart(JSONObject obj) throws JSONException {
 
-        linechart.setDragEnabled(true);
-        linechart.setBackgroundColor(Color.argb(80,173, 178, 186));
+        linechart.setBackgroundColor(Color.rgb(18, 37, 85));
 
-        ArrayList<Entry> yValues = new ArrayList<>();
+        linechart.getAxisRight().setDrawGridLines(false);
+        linechart.getAxisLeft().setDrawGridLines(false);
+        linechart.getAxisRight().setTextColor(Color.WHITE);
+        linechart.getAxisLeft().setTextColor(Color.WHITE);
+        linechart.getXAxis().setTextColor(Color.WHITE);
 
-        yValues.add(new Entry(0, 60f));
-        yValues.add(new Entry(1, 50f));
-        yValues.add(new Entry(2, 70f));
-        yValues.add(new Entry(3, 30f));
-        yValues.add(new Entry(4, 90f));
+        linechart.setTouchEnabled(true);
+        linechart.setClickable(false);
+        linechart.setDoubleTapToZoomEnabled(false);
+        linechart.setDoubleTapToZoomEnabled(false);
 
-        LineDataSet set1 = new LineDataSet(yValues, "Data Set 1");
+        linechart.setNoDataText("Cannot obtain data");
+        linechart.setNoDataTextColor(Color.WHITE);
 
-        set1.setFillAlpha(110);
-        set1.setColor(Color.rgb(251, 114, 104));
-        set1.setLineWidth(3);
+        linechart.getDescription().setEnabled(false);
+
+        XAxis xAxis = linechart.getXAxis();
+
+
+        Legend legend = linechart.getLegend();
+        legend.setTextColor(Color.WHITE);
+        legend.setForm(Legend.LegendForm.LINE);
+        legend.setFormLineWidth(4);
+
+        JSONArray date = obj.getJSONArray("cases_time_series");
+
+        ArrayList<Entry> recs = new ArrayList<>();
+        ArrayList<Entry> acts = new ArrayList<>();
+        ArrayList<Entry> deas = new ArrayList<>();
+
+        for(int i=date.length()-15; i <date.length();i++){
+
+            JSONObject data = date.getJSONObject(i);
+            recs.add(new Entry(i,Integer.parseInt(data.getString("dailyrecovered"))));
+            acts.add(new Entry(i,Integer.parseInt(data.getString("dailyconfirmed"))));
+            deas.add(new Entry(i,Integer.parseInt(data.getString("dailydeceased"))));
+            
+        }
+
+        LineDataSet rec = new LineDataSet(recs, "Daily Recovered");
+        rec.setFillAlpha(110);
+        rec.setColor(Color.rgb(246, 180, 67));
+        rec.setLineWidth(2);
+        rec.setCircleColor(Color.rgb(246, 180, 67));
+        rec.setCircleRadius(3);
+        rec.setCircleHoleColor(Color.WHITE);
+        rec.setCircleHoleRadius(1.5f);
+        rec.setValueTextSize(0);
+        rec.setDrawHighlightIndicators(false);
+
+
+        LineDataSet act = new LineDataSet(acts, "Daily Confirmed");
+        act.setFillAlpha(110);
+        act.setColor(Color.rgb(227, 77, 86));
+        act.setLineWidth(2);
+        act.setCircleColor(Color.rgb(227, 77, 86));
+        act.setCircleRadius(3);
+        act.setCircleHoleColor(Color.WHITE);
+        act.setCircleHoleRadius(1.5f);
+        act.setValueTextSize(0);
+        act.setDrawHighlightIndicators(false);
+
+        LineDataSet dea = new LineDataSet(deas, "Daily Deceased");
+        dea.setFillAlpha(110);
+        dea.setColor(Color.rgb(147, 147, 147));
+        dea.setLineWidth(2);
+        dea.setCircleColor(Color.rgb(147, 147, 147));
+        dea.setCircleRadius(3);
+        dea.setCircleHoleColor(Color.WHITE);
+        dea.setCircleHoleRadius(1.5f);
+        dea.setValueTextSize(0);
+        dea.setDrawHighlightIndicators(false);
+
 
         ArrayList<ILineDataSet> dataSets = new ArrayList<>();
-        dataSets.add(set1);
+        dataSets.add(rec);
+        dataSets.add(act);
+        dataSets.add(dea);
 
         LineData data = new LineData(dataSets);
+        linechart.setDrawGridBackground(false);
+        linechart.animateXY(1000,1000);
         linechart.setData(data);
 
-        table.setColumnStretchable(0, true);
-        table.setColumnStretchable(1, true);
-        table.setColumnStretchable(2, true);
-        table.setColumnStretchable(3, true);
-        table.setColumnStretchable(4, true);
     }
 
     @SuppressLint({"DefaultLocale", "ResourceType"})
     public void fetchtable(JSONArray obj) throws JSONException {
+
+        tableRow.setBackgroundColor(Color.argb(90,128,128,128));
 
         for (int i = 1; i < obj.length(); i++) {
 
@@ -259,14 +333,14 @@ public  class MainActivity
             tot.setText(String.format("%,d", total));
             tot.setPadding(5, 5, 5, 5);
             tot.setTextSize(16);
-            tot.setTextColor(Color.rgb(248, 198, 57));
+            tot.setTextColor(Color.rgb(227, 77, 86));
             tr.addView(tot);
 
             rec = new TextView(this);
             rec.setText(String.format("%,d", recovered));
             rec.setPadding(5, 5, 5, 5);
             rec.setTextSize(16);
-            rec.setTextColor(Color.rgb(251, 114, 104));
+            rec.setTextColor(Color.rgb(246, 180, 67));
             tr.addView(rec);
 
             act = new TextView(this);
