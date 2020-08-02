@@ -1,15 +1,13 @@
 package com.ankitha.covid19tracker;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
-import android.widget.SeekBar;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -20,43 +18,30 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.github.mikephil.charting.components.Description;
-import com.github.mikephil.charting.components.LegendEntry;
-import com.github.mikephil.charting.listener.OnChartGestureListener;
-import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
+
+import com.github.mikephil.charting.components.IMarker;
+import com.github.mikephil.charting.components.MarkerView;
 import com.razerdp.widget.animatedpieview.AnimatedPieView;
 import com.razerdp.widget.animatedpieview.AnimatedPieViewConfig;
 import com.razerdp.widget.animatedpieview.callback.OnPieSelectListener;
 import com.razerdp.widget.animatedpieview.data.IPieInfo;
 import com.razerdp.widget.animatedpieview.data.SimplePieInfo;
 
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.components.YAxis.AxisDependency;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
-import com.github.mikephil.charting.utils.ColorTemplate;
-
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Iterator;
-
-import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
 public  class MainActivity
         extends AppCompatActivity {
@@ -65,10 +50,9 @@ public  class MainActivity
     TextView tvCases, tvRecovered, tvActive, tvTotalDeaths, state, rec, tot, act, dea, time, none;
     TableRow tr, td,tableRow;
     TableLayout table;
+    Button confirmed, recovered, deaths;
 
-    private static final String TAG = "MainActivity";
     private LineChart linechart;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +77,14 @@ public  class MainActivity
                 = findViewById(R.id.tableRow1);
         linechart
                 = findViewById(R.id.linechart);
+        confirmed
+                = findViewById(R.id.confirmed_button);
+        recovered
+                = findViewById(R.id.recovered_button);
+        deaths
+                = findViewById(R.id.death_button);
+        none =
+                findViewById(R.id.no);
 
         table.setColumnStretchable(0, true);
         table.setColumnStretchable(1, true);
@@ -132,7 +124,6 @@ public  class MainActivity
                                     response.toString());
                             JSONArray paramsArr = obj.getJSONArray("statewise");
                             JSONObject data = paramsArr.getJSONObject(0);
-
 
                             int recovered = Integer.parseInt(data.getString("recovered"));
                             int active = Integer.parseInt(data.getString("active"));
@@ -206,42 +197,53 @@ public  class MainActivity
 
     }
 
+
+
     public void fetchchart(JSONObject obj) throws JSONException {
 
-        linechart.setBackgroundColor(Color.rgb(18, 37, 85));
-
-        linechart.getAxisRight().setDrawGridLines(false);
-        linechart.getAxisLeft().setDrawGridLines(false);
-        linechart.getAxisRight().setTextColor(Color.WHITE);
-        linechart.getAxisLeft().setTextColor(Color.WHITE);
-        linechart.getXAxis().setTextColor(Color.WHITE);
-
         linechart.setTouchEnabled(true);
-        linechart.setClickable(false);
-        linechart.setDoubleTapToZoomEnabled(false);
+        linechart.setClickable(true);
         linechart.setDoubleTapToZoomEnabled(false);
 
         linechart.setNoDataText("Cannot obtain data");
-        linechart.setNoDataTextColor(Color.WHITE);
+        linechart.setNoDataTextColor(Color.BLACK);
 
         linechart.getDescription().setEnabled(false);
+        linechart.getLegend().setEnabled(false);
+
+        linechart.setDrawGridBackground(false);
+        linechart.getAxisRight().setDrawGridLines(false);
+        linechart.getAxisLeft().setDrawGridLines(false);
+
+        linechart.animateXY(1000,1000);
+        linechart.setHighlightPerTapEnabled(true);
+        linechart.setDrawMarkers(true);
+
+        CustomMarkerView mv =new CustomMarkerView(this);
+        linechart.setMarker(mv);
+
+        final JSONArray date = obj.getJSONArray("cases_time_series");
+        
+        final ArrayList<String> dateaxis = new ArrayList<String>();
+
+        for( int i=0;i<date.length();i++) //Retrieve X Axis values
+        {
+            JSONObject data = date.getJSONObject(i);
+            dateaxis.add(data.getString("date"));
+        }
 
         XAxis xAxis = linechart.getXAxis();
+        xAxis.setGranularity(2f); // minimum axis-step (interval) is 2
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setValueFormatter(new IndexAxisValueFormatter(dateaxis));
+
+        final ArrayList<Entry> recs = new ArrayList<>();
+        final ArrayList<Entry> deas = new ArrayList<>();
+        final ArrayList<Entry> acts = new ArrayList<>();
 
 
-        Legend legend = linechart.getLegend();
-        legend.setTextColor(Color.WHITE);
-        legend.setForm(Legend.LegendForm.LINE);
-        legend.setFormLineWidth(4);
-
-        JSONArray date = obj.getJSONArray("cases_time_series");
-
-        ArrayList<Entry> recs = new ArrayList<>();
-        ArrayList<Entry> acts = new ArrayList<>();
-        ArrayList<Entry> deas = new ArrayList<>();
-
-        for(int i=date.length()-15; i <date.length();i++){
-
+        for(int i=date.length()-10; i <date.length();i++)
+        {
             JSONObject data = date.getJSONObject(i);
             recs.add(new Entry(i,Integer.parseInt(data.getString("dailyrecovered"))));
             acts.add(new Entry(i,Integer.parseInt(data.getString("dailyconfirmed"))));
@@ -249,19 +251,7 @@ public  class MainActivity
             
         }
 
-        LineDataSet rec = new LineDataSet(recs, "Daily Recovered");
-        rec.setFillAlpha(110);
-        rec.setColor(Color.rgb(246, 180, 67));
-        rec.setLineWidth(2);
-        rec.setCircleColor(Color.rgb(246, 180, 67));
-        rec.setCircleRadius(3);
-        rec.setCircleHoleColor(Color.WHITE);
-        rec.setCircleHoleRadius(1.5f);
-        rec.setValueTextSize(0);
-        rec.setDrawHighlightIndicators(false);
-
-
-        LineDataSet act = new LineDataSet(acts, "Daily Confirmed");
+        final LineDataSet act = new LineDataSet(acts, "Daily Confirmed");
         act.setFillAlpha(110);
         act.setColor(Color.rgb(227, 77, 86));
         act.setLineWidth(2);
@@ -270,9 +260,22 @@ public  class MainActivity
         act.setCircleHoleColor(Color.WHITE);
         act.setCircleHoleRadius(1.5f);
         act.setValueTextSize(0);
+        act.setAxisDependency(AxisDependency.LEFT);
         act.setDrawHighlightIndicators(false);
 
-        LineDataSet dea = new LineDataSet(deas, "Daily Deceased");
+        final LineDataSet rec = new LineDataSet(recs, "Daily Recovered");
+        rec.setFillAlpha(110);
+        rec.setColor(Color.rgb(246, 180, 67));
+        rec.setLineWidth(2);
+        rec.setCircleColor(Color.rgb(246, 180, 67));
+        rec.setCircleRadius(3);
+        rec.setCircleHoleColor(Color.WHITE);
+        rec.setCircleHoleRadius(1.5f);
+        rec.setValueTextSize(0);
+        rec.setAxisDependency(AxisDependency.LEFT);
+        rec.setDrawHighlightIndicators(false);
+
+        final LineDataSet dea = new LineDataSet(deas, "Daily Deceased");
         dea.setFillAlpha(110);
         dea.setColor(Color.rgb(147, 147, 147));
         dea.setLineWidth(2);
@@ -281,20 +284,53 @@ public  class MainActivity
         dea.setCircleHoleColor(Color.WHITE);
         dea.setCircleHoleRadius(1.5f);
         dea.setValueTextSize(0);
+        dea.setAxisDependency(AxisDependency.LEFT);
         dea.setDrawHighlightIndicators(false);
 
 
-        ArrayList<ILineDataSet> dataSets = new ArrayList<>();
+        final ArrayList<ILineDataSet> dataSets = new ArrayList<>();
         dataSets.add(rec);
         dataSets.add(act);
         dataSets.add(dea);
 
         LineData data = new LineData(dataSets);
-        linechart.setDrawGridBackground(false);
-        linechart.animateXY(1000,1000);
         linechart.setData(data);
 
+        confirmed.setOnClickListener(
+                new Button.OnClickListener(){
+                    public void onClick(View v){
+                        linechart.clear();
+                        LineData confirmed = new LineData(act);
+                        linechart.animateXY(1000,1000);
+                        linechart.setData(confirmed);
+                    }
+                }
+        );
+
+        recovered.setOnClickListener(
+                new Button.OnClickListener(){
+                    public void onClick(View v){
+                        linechart.clear();
+                        LineData confirmed = new LineData(rec);
+                        linechart.animateXY(1000,1000);
+                        linechart.setData(confirmed);
+                    }
+                }
+        );
+
+        deaths.setOnClickListener(
+                new Button.OnClickListener(){
+                    public void onClick(View v){
+                        linechart.clear();
+                        LineData confirmed = new LineData(dea);
+                        linechart.animateXY(1000,1000);
+                        linechart.setData(confirmed);
+                    }
+                }
+        );
+
     }
+
 
     @SuppressLint({"DefaultLocale", "ResourceType"})
     public void fetchtable(JSONArray obj) throws JSONException {
@@ -325,34 +361,34 @@ public  class MainActivity
                 state.setText("AN Islands");
             }
             state.setTextColor(Color.WHITE);
-            state.setTextSize(16);
+            state.setTextSize(14);
             state.setPadding(5, 5, 5, 5);
             tr.addView(state);
 
             tot = new TextView(this);
             tot.setText(String.format("%,d", total));
             tot.setPadding(5, 5, 5, 5);
-            tot.setTextSize(16);
+            tot.setTextSize(14);
             tot.setTextColor(Color.rgb(227, 77, 86));
             tr.addView(tot);
 
             rec = new TextView(this);
             rec.setText(String.format("%,d", recovered));
             rec.setPadding(5, 5, 5, 5);
-            rec.setTextSize(16);
+            rec.setTextSize(14);
             rec.setTextColor(Color.rgb(246, 180, 67));
             tr.addView(rec);
 
             act = new TextView(this);
             act.setText(String.format("%,d", active));
             act.setPadding(5, 5, 5, 5);
-            act.setTextSize(16);
+            act.setTextSize(14);
             act.setTextColor(Color.rgb(18, 182, 167));
             tr.addView(act);
 
             dea = new TextView(this);
             dea.setPadding(5, 5, 5, 5);
-            dea.setTextSize(16);
+            dea.setTextSize(14);
             dea.setText(String.format("%,d", death));
             dea.setTextColor(Color.rgb(128, 128, 128));
             tr.addView(dea);
@@ -365,9 +401,9 @@ public  class MainActivity
             table.addView(tr);
             table.addView(td);
 
-
         }
     }
+
 }
 
 

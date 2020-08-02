@@ -180,22 +180,55 @@
 
         <com.razerdp.widget.animatedpieview.AnimatedPieView
             android:id="@+id/piechart"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
             android:layout_below="@id/tvTotalDeaths" />
 
         <com.github.mikephil.charting.charts.LineChart
             android:id="@+id/linechart"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:layout_height="250dp"
+            android:background="@drawable/rounded_corner"
             android:layout_below="@id/piechart"
-            android:layout_margin="10dp" />
+            android:padding="90dp"/>
+        <Button
+            android:id="@+id/confirmed_button"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:layout_below="@id/linechart"
+            android:backgroundTint="@color/Total"
+            android:text="Confirmed"
+            android:layout_marginLeft="50dp"
+            android:textSize="10dp"
+            />
+        <Button
+            android:id="@+id/recovered_button"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:layout_below="@id/linechart"
+            android:layout_centerHorizontal="true"
+            android:text="Recovered"
+            android:backgroundTint="@color/Recovered"
+            android:textSize="10dp"
+            />
+        <Button
+            android:id="@+id/death_button"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:layout_below="@id/linechart"
+            android:layout_marginLeft="230dp"
+            android:backgroundTint="@color/Death"
+            android:text="Deaths"
+            android:textSize="10dp"
+            />
 
         <TableLayout
             android:id="@+id/table"
             android:layout_width="fill_parent"
             android:layout_height="match_parent"
-            android:layout_below="@id/linechart"
+            android:layout_below="@id/confirmed_button"
+            android:layout_marginTop="10dp"
             android:stretchColumns="0,1,2,3,4">
 
 
@@ -252,7 +285,7 @@
             android:id="@+id/no"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/table"
+            android:layout_below="@id/tvTotalDeaths"
             android:textColor="@color/color_white" />
 
     </RelativeLayout>
