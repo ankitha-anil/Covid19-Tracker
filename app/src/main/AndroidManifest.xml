@@ -15,6 +15,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".state_info">
+        </activity>
+        <activity
+            android:name="statistics">
+        </activity>
     </application>
 
 </manifest>

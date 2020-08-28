@@ -13,7 +13,9 @@
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="20dp">
+        android:paddingLeft="20dp"
+        android:paddingBottom="20dp"
+        android:paddingRight="20dp">
 
         <!--Text view to display Total Cases-->
 
@@ -177,116 +179,29 @@
             android:textSize="24sp"
             android:textStyle="bold" />
 
-
-        <com.razerdp.widget.animatedpieview.AnimatedPieView
-            android:id="@+id/piechart"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_below="@id/tvTotalDeaths" />
-
-        <com.github.mikephil.charting.charts.LineChart
-            android:id="@+id/linechart"
-            android:layout_width="match_parent"
-            android:layout_height="250dp"
+        <Button
+            android:id="@+id/statistics"
             android:background="@drawable/rounded_corner"
-            android:layout_below="@id/piechart"
-            android:padding="90dp"/>
-        <Button
-            android:id="@+id/confirmed_button"
-            android:layout_width="wrap_content"
-            android:layout_height="35dp"
-            android:layout_below="@id/linechart"
-            android:backgroundTint="@color/Total"
-            android:text="Confirmed"
-            android:layout_marginLeft="50dp"
-            android:textSize="10dp"
-            />
-        <Button
-            android:id="@+id/recovered_button"
-            android:layout_width="wrap_content"
-            android:layout_height="35dp"
-            android:layout_below="@id/linechart"
-            android:layout_centerHorizontal="true"
-            android:text="Recovered"
-            android:backgroundTint="@color/Recovered"
-            android:textSize="10dp"
-            />
-        <Button
-            android:id="@+id/death_button"
-            android:layout_width="wrap_content"
-            android:layout_height="35dp"
-            android:layout_below="@id/linechart"
-            android:layout_marginLeft="230dp"
-            android:backgroundTint="@color/Death"
-            android:text="Deaths"
-            android:textSize="10dp"
-            />
-
-        <TableLayout
-            android:id="@+id/table"
-            android:layout_width="fill_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@id/confirmed_button"
-            android:layout_marginTop="10dp"
-            android:stretchColumns="0,1,2,3,4">
-
-
-            <TableRow
-                android:id="@+id/tableRow1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    android:id="@+id/stateheader"
-                    android:layout_weight="0"
-                    android:gravity="center"
-                    android:padding="5dp"
-                    android:text="States/ Constituents "
-                    android:textColor="@color/color_white" />
-
-                <TextView
-                    android:id="@+id/theader"
-                    android:layout_weight="0"
-                    android:gravity="center"
-                    android:padding="5dp"
-                    android:text="Total"
-                    android:textColor="@color/Total" />
-
-                <TextView
-                    android:id="@+id/rheader"
-                    android:layout_weight="0"
-                    android:gravity="center"
-                    android:padding="5dp"
-                    android:text="R"
-                    android:textColor="@color/Recovered" />
-
-                <TextView
-                    android:id="@+id/aheader"
-                    android:layout_weight="0"
-                    android:gravity="center"
-                    android:padding="5dp"
-                    android:text="A"
-                    android:textColor="@color/Active" />
-
-                <TextView
-                    android:id="@+id/dheader"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:padding="5dp"
-                    android:text="D"
-                    android:textColor="@color/colorPrimary" />
-
-            </TableRow>
-
-        </TableLayout>
-
-        <TextView
-            android:id="@+id/no"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="275dp"
+            android:layout_height="40dp"
             android:layout_below="@id/tvTotalDeaths"
-            android:textColor="@color/color_white" />
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="25dp"
+            android:text="Statistics"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/state"
+            android:background="@drawable/rounded_corner"
+            android:layout_width="275dp"
+            android:layout_height="40dp"
+            android:layout_below="@id/statistics"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
+            android:text="State Information"
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
     </RelativeLayout>
 

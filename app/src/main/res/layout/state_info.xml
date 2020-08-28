@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="#102059"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp">
+
+        <ImageButton
+            android:id="@+id/main"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/ic_back" />
+
+        <TableLayout
+            android:id="@+id/table"
+            android:layout_below="@+id/main"
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp"
+            android:stretchColumns="0,1,2,3,4">
+
+
+            <TableRow
+                android:id="@+id/tableRow1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/stateheader"
+                    android:layout_weight="0"
+                    android:gravity="center"
+                    android:padding="5dp"
+                    android:text="States/ Constituents "
+                    android:textColor="@color/color_white" />
+
+                <TextView
+                    android:id="@+id/theader"
+                    android:layout_weight="0"
+                    android:gravity="center"
+                    android:padding="5dp"
+                    android:text="Total"
+                    android:textColor="@color/Total" />
+
+                <TextView
+                    android:id="@+id/rheader"
+                    android:layout_weight="0"
+                    android:gravity="center"
+                    android:padding="5dp"
+                    android:text="R"
+                    android:textColor="@color/Recovered" />
+
+                <TextView
+                    android:id="@+id/aheader"
+                    android:layout_weight="0"
+                    android:gravity="center"
+                    android:padding="5dp"
+                    android:text="A"
+                    android:textColor="@color/Active" />
+
+                <TextView
+                    android:id="@+id/dheader"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:padding="5dp"
+                    android:text="D"
+                    android:textColor="@color/colorPrimary" />
+
+            </TableRow>
+
+        </TableLayout>
+
+    </RelativeLayout>
+
+</ScrollView>

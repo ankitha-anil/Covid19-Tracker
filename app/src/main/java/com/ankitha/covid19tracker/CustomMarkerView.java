@@ -20,7 +20,7 @@ public class CustomMarkerView extends MarkerView {
 
     @Override
     public void refreshContent(Entry e, Highlight highlight) {
-        tvContent.setText("" + (int) e.getY());
+        tvContent.setText("" + String.format("%,d", (int) e.getY()));
         super.refreshContent(e, highlight);
     }
 

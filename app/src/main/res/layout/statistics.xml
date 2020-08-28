@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="#102059"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="20dp"
+        android:paddingBottom="20dp"
+        android:paddingRight="20dp">
+
+        <ImageButton
+            android:id="@+id/main"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/ic_back" />
+
+        <com.razerdp.widget.animatedpieview.AnimatedPieView
+            android:id="@+id/piechart"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/main"
+            android:layout_centerHorizontal="true" />
+
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/linechart"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:background="@drawable/rounded_corner"
+            android:layout_below="@id/piechart"
+         />
+        <Button
+            android:id="@+id/confirmed_button"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:layout_above="@id/linechart"
+            android:backgroundTint="@color/Total"
+            android:text="Confirmed"
+            android:layout_marginLeft="50dp"
+            android:textSize="10dp"
+            />
+        <Button
+            android:id="@+id/recovered_button"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:layout_above="@id/linechart"
+            android:layout_centerHorizontal="true"
+            android:text="Recovered"
+            android:backgroundTint="@color/Recovered"
+            android:textSize="10dp"
+            />
+        <Button
+            android:id="@+id/death_button"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:layout_above="@id/linechart"
+            android:layout_marginLeft="230dp"
+            android:backgroundTint="@color/Death"
+            android:text="Deaths"
+            android:textSize="10dp"
+            />
+
+
+
+
+    </RelativeLayout>
+
+</ScrollView>
