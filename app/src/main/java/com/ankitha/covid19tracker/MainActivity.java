@@ -26,7 +26,7 @@ public  class MainActivity
         extends AppCompatActivity {
 
     // Create the object of TextView
-    TextView tvCases, tvRecovered, tvActive, tvTotalDeaths,time;
+    TextView tvCases, tvRecovered, tvActive, tvTotalDeaths,time, no;
 
     Button statistics, state_button;
 
